@@ -1,0 +1,71 @@
+name: evpn-mvp
+
+topology:
+  defaults:
+    kind: linux
+    image: quay.io/frrouting/frr:10.2.1
+
+  nodes:
+    spine-1:
+      binds:
+        - configs/daemons:/etc/frr/daemons
+        - configs/vtysh.conf:/etc/frr/vtysh.conf
+        - configs/spine-1/frr.conf:/etc/frr/frr.conf
+        - configs/spine-1/setup.sh:/setup.sh
+      exec: ["bash", "/setup.sh"]
+
+    spine-2:
+      binds:
+        - configs/daemons:/etc/frr/daemons
+        - configs/vtysh.conf:/etc/frr/vtysh.conf
+        - configs/spine-2/frr.conf:/etc/frr/frr.conf
+        - configs/spine-2/setup.sh:/setup.sh
+      exec: ["bash", "/setup.sh"]
+
+    leaf-1:
+      binds:
+        - configs/daemons:/etc/frr/daemons
+        - configs/vtysh.conf:/etc/frr/vtysh.conf
+        - configs/leaf-1/frr.conf:/etc/frr/frr.conf
+        - configs/leaf-1/setup.sh:/setup.sh
+      exec: ["bash", "/setup.sh"]
+
+    leaf-2:
+      binds:
+        - configs/daemons:/etc/frr/daemons
+        - configs/vtysh.conf:/etc/frr/vtysh.conf
+        - configs/leaf-2/frr.conf:/etc/frr/frr.conf
+        - configs/leaf-2/setup.sh:/setup.sh
+      exec: ["bash", "/setup.sh"]
+
+    host-1:
+      image: wbitt/network-multitool:alpine-extra
+      binds:
+        - configs/host-1/setup.sh:/setup.sh
+      exec: ["bash", "/setup.sh"]
+
+    host-2:
+      image: wbitt/network-multitool:alpine-extra
+      binds:
+        - configs/host-2/setup.sh:/setup.sh
+      exec: ["bash", "/setup.sh"]
+
+    host-3:
+      image: wbitt/network-multitool:alpine-extra
+      binds:
+        - configs/host-3/setup.sh:/setup.sh
+      exec: ["bash", "/setup.sh"]
+
+  links:
+    # Full-Mesh CLOS Underlay (каждый Leaf с каждым Spine)
+    - endpoints: ["spine-1:eth1", "leaf-1:eth1"]
+    - endpoints: ["spine-1:eth2", "leaf-2:eth1"]
+    - endpoints: ["spine-2:eth1", "leaf-1:eth2"]
+    - endpoints: ["spine-2:eth2", "leaf-2:eth2"]
+
+    # Подключение серверов
+    - endpoints: ["leaf-1:eth3", "host-1:eth1"]
+    - endpoints: ["leaf-1:eth4", "host-2:eth1"]
+    - endpoints: ["leaf-2:eth4", "host-2:eth2"]
+    - endpoints: ["leaf-2:eth3", "host-3:eth1"]
+

@@ -1,0 +1,5 @@
+bgpd=yes
+zebra=yes
+staticd=yes
+bfdd=yes
+
