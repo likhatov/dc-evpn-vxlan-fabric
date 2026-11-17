@@ -61,6 +61,7 @@ bridge vlan add vid 30 dev eth3 pvid untagged
 # Port eth4 -> bond-h2 -> host-2 (EVPN Multihoming, VLAN 20, Tenant A)
 ip link add bond-h2 type bond mode 802.3ad lacp_rate fast miimon 100 xmit_hash_policy layer3+4
 ip link set bond-h2 mtu 9000
+ip link set bond-h2 address 00:00:00:00:00:01
 ip link set eth4 down && ip link set eth4 master bond-h2
 ip link set bond-h2 master br0 up
 bridge vlan add vid 20 dev bond-h2 pvid untagged
